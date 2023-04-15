@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
-
-from flask import Flask, redirect, render_template, request, send_from_directory, url_for
+import json 
+from flask import Flask, redirect, render_template, request,Response, send_from_directory, url_for
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -39,6 +39,17 @@ def index():
     print('Request for index page received')
     restaurants = Restaurant.query.all()
     return render_template('index.html', restaurants=restaurants)
+
+@app.route('/bitbucket', methods=['POST'])
+@csrf.exempt
+def bitbucketevents():
+    payload = request.json
+    restaurant = Restaurant()
+    restaurant.name = 'bitbucket'
+    restaurant.description = json.dumps(payload)
+    db.session.add(restaurant)
+    db.session.commit()
+    return Response(status=200)
 
 @app.route('/<int:id>', methods=['GET'])
 def details(id):
